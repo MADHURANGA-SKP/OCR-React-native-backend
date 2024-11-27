@@ -1,17 +1,20 @@
 package util
 
 import (
+	"time"
+
 	"github.com/spf13/viper"
 )
 
 // config stores all the configuration details of the program
 // the values are read by viper  from config file or enviroment vaiable
 type Config struct {
-	Environment       string `mapstructure:"ENVIRONMENT"`
-	DBSource          string `mapstructure:"DB_SOURCE"`
-	MigrationURL      string `mapstructure:"MIGRATION_URL"`
-	HTTPServerAddress string `mapstructure:"HTTP_SERVER_ADDRESS"`
-	FrontEndOrigin    string `mapstructure:"FRONT_END_ORIGIN"`
+	Environment          string        `mapstructure:"ENVIRONMENT"`
+	DBSource             string        `mapstructure:"DB_SOURCE"`
+	MigrationURL         string        `mapstructure:"MIGRATION_URL"`
+	HTTPServerAddress    string        `mapstructure:"HTTP_SERVER_ADDRESS"`
+	AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 }
 
 // loadconfig reads configurations from file or enviornment variables
