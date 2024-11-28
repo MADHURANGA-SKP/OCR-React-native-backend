@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	db "ocr/db/sqlc"
 	"ocr/token"
 	"ocr/util"
@@ -24,9 +25,15 @@ type Server struct {
 
 // NewServer create a http server and setup routing
 func NewServer(config util.Config, store db.Store) (*Server, error) {
+	tokenMaker, err := token.NewJWTMaker(config.TokenSymmetricKey)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create token maker: %w", err)
+	}
+
 	server := &Server{
-		config: config,
-		store:  store,
+		config:     config,
+		store:      store,
+		tokenMaker: tokenMaker,
 	}
 
 	//calls the setupRouter method to configure routing for the server
@@ -47,6 +54,17 @@ func (server *Server) setupRouter() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+
+	v1 := router.Group("/ocr")
+	{
+		v1.POST("/signup", server.CreateUser)
+		v1.POST("/login", server.LoginUser)
+		v1.POST("/refresh/accesstoken", server.ReNewAccessToken)
+		v1.GET("/getuser", server.GetUser)
+		v1.DELETE("/deluser", server.DeleteUser)
+		v1.PATCH("/updateuser", server.UpadteUser)
+		v1.POST("/imageconv", server.CreateImageConversion)
+	}
 
 	server.router = router
 }

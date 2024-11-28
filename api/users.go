@@ -36,6 +36,7 @@ func newUserResponse(user db.User) CreateUserResponse {
 		UserName:  user.UserName,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
+		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 	}
 }
@@ -43,8 +44,8 @@ func newUserResponse(user db.User) CreateUserResponse {
 func (server Server) CreateUser(ctx *gin.Context) {
 	var req CreateUserRequest
 
-	if err := ctx.ShouldBindJSON(req); err != nil {
-		err = errors.New("input is not valid, Please Check")
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		// err = errors.New("input is not valid, Please Check")
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -53,7 +54,7 @@ func (server Server) CreateUser(ctx *gin.Context) {
 		UserName:       req.UserName,
 		FirstName:      req.FirstName,
 		LastName:       req.LastName,
-		Email:          req.LastName,
+		Email:          req.Email,
 		HashedPassword: req.HashedPassword,
 	}
 
@@ -82,10 +83,10 @@ type GetUserResponse struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (server Server) GetUserRequest(ctx *gin.Context) {
+func (server Server) GetUser(ctx *gin.Context) {
 	var req GetUserRequest
 
-	if err := ctx.ShouldBindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		err = errors.New("user not found, Please enter your correct User Name")
 		ctx.JSON(http.StatusNotFound, errorResponse(err))
 		return
@@ -106,10 +107,10 @@ type DeleteUserRequest struct {
 	UserID int64 `json:"user_id"`
 }
 
-func (server Server) DeleteUserRequest(ctx *gin.Context) {
+func (server Server) DeleteUser(ctx *gin.Context) {
 	var req DeleteUserRequest
 
-	if err := ctx.ShouldBindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		err = errors.New("user not found, Please enter your correct User Name")
 		ctx.JSON(http.StatusNotFound, errorResponse(err))
 		return
@@ -145,10 +146,10 @@ type UpadteUserResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func (server Server) UpadteUserRequest(ctx *gin.Context) {
+func (server Server) UpadteUser(ctx *gin.Context) {
 	var req UpadteUserRequest
 
-	if err := ctx.ShouldBindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		err = errors.New("user not found, Please enter your correct User Name")
 		ctx.JSON(http.StatusNotFound, errorResponse(err))
 		return
@@ -221,7 +222,7 @@ func (server *Server) LoginUser(ctx *gin.Context) {
 	user, err := server.store.GetUsers(ctx, req.UserName)
 	if err != nil {
 		if db.ErrorCode(err) == db.UniqueViolations {
-			err = errors.New("user not found, Please enter your correct User Name")
+			// err = errors.New("user not found, Please enter your correct User Name")
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
@@ -238,7 +239,7 @@ func (server *Server) LoginUser(ctx *gin.Context) {
 		server.config.RefreshTokenDuration,
 	)
 	if err != nil {
-		err = errors.New("unable to Create Access Token, Please try again later")
+		// err = errors.New("unable to Create Access Token, Please try again later")
 		ctx.JSON(http.StatusNotFound, errorResponse(err))
 	}
 
@@ -249,7 +250,7 @@ func (server *Server) LoginUser(ctx *gin.Context) {
 		server.config.AccessTokenDuration,
 	)
 	if err != nil {
-		err = errors.New("unable to Create Refresh Token, Please try again later")
+		// err = errors.New("unable to Create Refresh Token, Please try again later")
 		ctx.JSON(http.StatusNotFound, errorResponse(err))
 	}
 
@@ -264,7 +265,7 @@ func (server *Server) LoginUser(ctx *gin.Context) {
 		ExpiresAt:    refreshPayload.ExpiredAt,
 	})
 	if err != nil {
-		err = errors.New("unable to Create User Session, Please try again later")
+		// err = errors.New("unable to Create User Session, Please try again later")
 		ctx.JSON(http.StatusNotFound, errorResponse(err))
 	}
 

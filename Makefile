@@ -1,6 +1,6 @@
 DB_URL = postgresql://pasan:12345@localhost:5433/ocr?sslmode=disable
 
-postgres:
+ocr:
 	docker run -d --name ocr -p 5433:5432 -e POSTGRES_USER=pasan -e POSTGRES_PASSWORD=12345 postgres:16-alpine
 
 createdb:
