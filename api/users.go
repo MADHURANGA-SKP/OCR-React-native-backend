@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -189,4 +190,94 @@ func (server Server) UpadteUserRequest(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, user)
+}
+
+// LoginUserRequest contains the input parameters of login into the system
+type LoginUserRequest struct {
+	UserName       string `json:"user_name"`
+	HashedPassword string `json:"hashed_password"`
+}
+
+// LoginUserResponse contains the response of login process
+type LoginUserResponse struct {
+	SessionID             uuid.UUID          `json:"session_id"`
+	AccessToken           string             `json:"access_token"`
+	AccessTokenExpiresAt  time.Time          `json:"access_token_expires_at"`
+	RefreshToken          string             `json:"refresh_token"`
+	RefreshTokenExpiresAt time.Time          `json:"refresh_token_expires_at"`
+	User                  CreateUserResponse `json:"user"`
+}
+
+func (server *Server) LoginUser(ctx *gin.Context) {
+	var req LoginUserRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		err := errors.New("input is not valid, Please try again")
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	//get user detials from certain user using username
+	user, err := server.store.GetUsers(ctx, req.UserName)
+	if err != nil {
+		if db.ErrorCode(err) == db.UniqueViolations {
+			err = errors.New("user not found, Please enter your correct User Name")
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
+		err = errors.New("you don't have an account. Please sign up")
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		return
+	}
+
+	//create a access token for certain user with duration and user details
+	accessToken, accessPayload, err := server.tokenMaker.CreateToken(
+		user.UserName,
+		user.UserID,
+		server.config.RefreshTokenDuration,
+	)
+	if err != nil {
+		err = errors.New("unable to Create Access Token, Please try again later")
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+	}
+
+	//create refresh token for that certain user with duration and user details
+	refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(
+		user.UserName,
+		user.UserID,
+		server.config.AccessTokenDuration,
+	)
+	if err != nil {
+		err = errors.New("unable to Create Refresh Token, Please try again later")
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+	}
+
+	//create a session for that certain user
+	session, err := server.store.CreateSession(ctx, db.CreateSessionParams{
+		SessionID:    refreshPayload.ID,
+		UserID:       user.UserID,
+		RefreshToken: refreshToken,
+		UserAgent:    ctx.Request.UserAgent(),
+		ClientIp:     ctx.ClientIP(),
+		IsBlocked:    false,
+		ExpiresAt:    refreshPayload.ExpiredAt,
+	})
+	if err != nil {
+		err = errors.New("unable to Create User Session, Please try again later")
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+	}
+
+	//login user response of required details
+	rsp := LoginUserResponse{
+		SessionID:             session.SessionID,
+		AccessToken:           accessToken,
+		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
+		RefreshToken:          refreshToken,
+		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
+		User:                  newUserResponse(user),
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
+
 }

@@ -2,6 +2,7 @@ package api
 
 import (
 	db "ocr/db/sqlc"
+	"ocr/token"
 	"ocr/util"
 	"time"
 
@@ -15,9 +16,10 @@ import (
 // holds core routing component for handling HTTP requests
 // holds instance of worker.TaskDistributor to distribute tasks to worker processes
 type Server struct {
-	config util.Config
-	store  db.Store
-	router *gin.Engine
+	config     util.Config
+	tokenMaker token.Maker
+	store      db.Store
+	router     *gin.Engine
 }
 
 // NewServer create a http server and setup routing

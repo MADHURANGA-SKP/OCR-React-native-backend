@@ -6,15 +6,19 @@ package db
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
 	CreateImageConversion(ctx context.Context, arg CreateImageConversionParams) (ImageConversion, error)
+	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUsers(ctx context.Context, arg CreateUsersParams) (User, error)
 	DeleteImageConversion(ctx context.Context, conversionID int32) error
 	DeleteUsers(ctx context.Context, userID int64) error
 	GetImageConversionByID(ctx context.Context, conversionID int32) (ImageConversion, error)
 	GetImageConversionsByUser(ctx context.Context, userID int32) ([]ImageConversion, error)
+	GetSession(ctx context.Context, sessionID uuid.UUID) (Session, error)
 	GetUser(ctx context.Context, userID int64) (GetUserRow, error)
 	GetUserID(ctx context.Context, userID int64) (GetUserIDRow, error)
 	GetUsers(ctx context.Context, userName string) (User, error)
