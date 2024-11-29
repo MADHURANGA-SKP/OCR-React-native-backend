@@ -44,7 +44,7 @@ DELETE FROM image_conversions
 WHERE conversion_id = $1
 `
 
-func (q *Queries) DeleteImageConversion(ctx context.Context, conversionID int32) error {
+func (q *Queries) DeleteImageConversion(ctx context.Context, conversionID int64) error {
 	_, err := q.db.Exec(ctx, deleteImageConversion, conversionID)
 	return err
 }
@@ -62,7 +62,7 @@ WHERE conversion_id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetImageConversionByID(ctx context.Context, conversionID int32) (ImageConversion, error) {
+func (q *Queries) GetImageConversionByID(ctx context.Context, conversionID int64) (ImageConversion, error) {
 	row := q.db.QueryRow(ctx, getImageConversionByID, conversionID)
 	var i ImageConversion
 	err := row.Scan(
@@ -77,14 +77,7 @@ func (q *Queries) GetImageConversionByID(ctx context.Context, conversionID int32
 }
 
 const getImageConversionsByUser = `-- name: GetImageConversionsByUser :many
-SELECT 
-    conversion_id,
-    user_id,
-    image_name,
-    extracted_text,
-    created_at,
-    updated_at
-FROM image_conversions
+SELECT conversion_id, user_id, image_name, extracted_text, created_at, updated_at FROM image_conversions
 WHERE user_id = $1
 `
 
@@ -126,7 +119,7 @@ RETURNING conversion_id, user_id, image_name, extracted_text, created_at, update
 `
 
 type UpdateImageConversionParams struct {
-	ConversionID  int32  `json:"conversion_id"`
+	ConversionID  int64  `json:"conversion_id"`
 	ImageName     string `json:"image_name"`
 	ExtractedText string `json:"extracted_text"`
 }

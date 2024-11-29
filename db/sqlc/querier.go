@@ -14,9 +14,9 @@ type Querier interface {
 	CreateImageConversion(ctx context.Context, arg CreateImageConversionParams) (ImageConversion, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUsers(ctx context.Context, arg CreateUsersParams) (User, error)
-	DeleteImageConversion(ctx context.Context, conversionID int32) error
+	DeleteImageConversion(ctx context.Context, conversionID int64) error
 	DeleteUsers(ctx context.Context, userID int64) error
-	GetImageConversionByID(ctx context.Context, conversionID int32) (ImageConversion, error)
+	GetImageConversionByID(ctx context.Context, conversionID int64) (ImageConversion, error)
 	GetImageConversionsByUser(ctx context.Context, userID int32) ([]ImageConversion, error)
 	GetSession(ctx context.Context, sessionID uuid.UUID) (Session, error)
 	GetUser(ctx context.Context, userID int64) (GetUserRow, error)

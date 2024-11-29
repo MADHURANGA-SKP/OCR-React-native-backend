@@ -11,7 +11,7 @@ import (
 )
 
 type ImageConversion struct {
-	ConversionID  int32     `json:"conversion_id"`
+	ConversionID  int64     `json:"conversion_id"`
 	UserID        int32     `json:"user_id"`
 	ImageName     string    `json:"image_name"`
 	ExtractedText string    `json:"extracted_text"`

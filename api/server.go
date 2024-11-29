@@ -61,6 +61,7 @@ func (server *Server) setupRouter() {
 		v1.POST("/login", server.LoginUser)
 		v1.POST("/refresh/accesstoken", server.ReNewAccessToken)
 		v1.GET("/getuser", server.GetUser)
+		v1.GET("/getusers", server.GetImageConversion)
 		v1.DELETE("/deluser", server.DeleteUser)
 		v1.PATCH("/updateuser", server.UpadteUser)
 		v1.POST("/imageconv", server.CreateImageConversion)
