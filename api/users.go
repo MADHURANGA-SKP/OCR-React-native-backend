@@ -71,7 +71,7 @@ func (server Server) CreateUser(ctx *gin.Context) {
 
 // get user
 type GetUserRequest struct {
-	UserID int64 `json:"user_id"`
+	UserID int64 `form:"user_id"`
 }
 
 type GetUserResponse struct {
@@ -86,15 +86,15 @@ type GetUserResponse struct {
 func (server Server) GetUser(ctx *gin.Context) {
 	var req GetUserRequest
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		err = errors.New("user not found, Please enter your correct User Name")
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		// err = errors.New("user not found, Please enter your correct data")
 		ctx.JSON(http.StatusNotFound, errorResponse(err))
 		return
 	}
 
 	user, err := server.store.GetUser(ctx, req.UserID)
 	if err != nil {
-		err = errors.New("user not found, Please enter your correct User Name")
+		err = errors.New("user not found, Please enter your correct id")
 		ctx.JSON(http.StatusNotFound, errorResponse(err))
 		return
 	}
@@ -138,12 +138,13 @@ type UpadteUserRequest struct {
 }
 
 type UpadteUserResponse struct {
-	UserID    int64     `json:"user_id"`
-	UserName  string    `json:"user_name"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	Email     string    `json:"email"`
-	UpdatedAt time.Time `json:"updated_at"`
+	UserID         int64     `json:"user_id"`
+	UserName       string    `json:"user_name"`
+	FirstName      string    `json:"first_name"`
+	LastName       string    `json:"last_name"`
+	Email          string    `json:"email"`
+	HashedPassword string    `json:"hashed_password"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 func (server Server) UpadteUser(ctx *gin.Context) {

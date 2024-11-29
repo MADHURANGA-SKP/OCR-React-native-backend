@@ -8,14 +8,7 @@ INSERT INTO image_conversions (
 ) RETURNING *;
 
 -- name: GetImageConversionsByUser :many
-SELECT 
-    conversion_id,
-    user_id,
-    image_name,
-    extracted_text,
-    created_at,
-    updated_at
-FROM image_conversions
+SELECT * FROM image_conversions
 WHERE user_id = $1;
 
 -- name: GetImageConversionByID :one

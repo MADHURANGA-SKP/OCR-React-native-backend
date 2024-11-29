@@ -78,9 +78,7 @@ func (server Server) CreateImageConversion(ctx *gin.Context) {
 }
 
 type GetImageConversionRequest struct {
-	UserID        int32  `json:"user_id"`
-	ImageName     string `json:"image_name"`
-	ExtractedText string `json:"extracted_text"`
+	UserID int32 `form:"user_id"`
 }
 
 type GetImageConversionResponse struct {
@@ -90,5 +88,19 @@ type GetImageConversionResponse struct {
 }
 
 func (server Server) GetImageConversion(ctx *gin.Context) {
+	var req GetImageConversionRequest
 
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	users, err := server.store.GetImageConversionsByUser(ctx, req.UserID)
+	if err != nil {
+		err = errors.New("user not found, Please enter your correct id")
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, users)
 }
