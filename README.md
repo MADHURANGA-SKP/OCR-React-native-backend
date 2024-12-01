@@ -3,7 +3,7 @@
 <p>User Authentication: Sign-up, login, and secure user sessions.</p>
 <p>Image-to-Text Conversion: Extract text from uploaded images using Tesseract OCR.</p>
 <p>Data Storage and Retrieval: Save extracted text and associated metadata (e.g., image name) in a database and allow users to retrieve their extracted data.</p>
-<p>The API is built using Go with Gin for HTTP routing, Tesseract OCR for text extraction, and a PostgreSQL database for data storage.</p><h2>General Information</h2>
+<p>The API is built using Go with Gin for HTTP routing, github.com/tiagomelo/go-ocr/ocr for text extraction, and a PostgreSQL database for data storage.</p><h2>General Information</h2>
 <hr><ul>
 <li>User Authentication</li>
 </ul>
